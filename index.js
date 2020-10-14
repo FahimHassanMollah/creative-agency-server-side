@@ -20,6 +20,8 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
     const orderCollection = client.db("creative-agency").collection("orderDetails");
+    const serviceCollection = client.db("creative-agency").collection("serviceDetails");
+    const reviewCollection = client.db("creative-agency").collection("review");
     app.post('/saveOrderInformations', (req, res) => {
         orderCollection.insertOne(req.body)
             .then(result => {
@@ -28,6 +30,54 @@ client.connect(err => {
 
             })
     });
+    app.post('/addService', (req, res) => {
+        serviceCollection.insertOne(req.body)
+            .then(result => {
+
+                res.send(result.insertedCount > 0);
+
+            })
+    });
+    app.get('/getUserServiceListByEmail/:email',(req,res)=>{
+        console.log(req.params);
+        orderCollection.find({email:req.params.email})
+        .toArray((err,documents)=>{
+            res.send(documents);
+           
+        })
+    });
+    app.get('/getServiceImage',(req,res)=>{
+        console.log(req.params);
+        serviceCollection.find({})
+        .toArray((err,documents)=>{
+            res.send(documents);
+           
+        })
+    });
+    app.post('/addReview', (req, res) => {
+        reviewCollection.insertOne(req.body)
+            .then(result => {
+
+                res.send(result.insertedCount > 0);
+
+            })
+    });
+    app.get('/getAllReview',(req,res)=>{
+        reviewCollection.find({})
+        .toArray((err,documents)=>{
+            res.send(documents);
+           
+        })
+    });
+    app.get('/getAllOrderInformation',(req,res)=>{
+        orderCollection.find({})
+        .toArray((err,documents)=>{
+            
+            res.send(documents);
+           
+        })
+    });
+
     console.log('working ');
 });
 
