@@ -22,6 +22,7 @@ client.connect(err => {
     const orderCollection = client.db("creative-agency").collection("orderDetails");
     const serviceCollection = client.db("creative-agency").collection("serviceDetails");
     const reviewCollection = client.db("creative-agency").collection("review");
+    const adminCollection = client.db("creative-agency").collection("admin");
     app.post('/saveOrderInformations', (req, res) => {
         orderCollection.insertOne(req.body)
             .then(result => {
@@ -38,21 +39,21 @@ client.connect(err => {
 
             })
     });
-    app.get('/getUserServiceListByEmail/:email',(req,res)=>{
+    app.get('/getUserServiceListByEmail/:email', (req, res) => {
         console.log(req.params);
-        orderCollection.find({email:req.params.email})
-        .toArray((err,documents)=>{
-            res.send(documents);
-           
-        })
+        orderCollection.find({ email: req.params.email })
+            .toArray((err, documents) => {
+                res.send(documents);
+
+            })
     });
-    app.get('/getServiceImage',(req,res)=>{
+    app.get('/getServiceImage', (req, res) => {
         console.log(req.params);
         serviceCollection.find({})
-        .toArray((err,documents)=>{
-            res.send(documents);
-           
-        })
+            .toArray((err, documents) => {
+                res.send(documents);
+
+            })
     });
     app.post('/addReview', (req, res) => {
         reviewCollection.insertOne(req.body)
@@ -62,19 +63,35 @@ client.connect(err => {
 
             })
     });
-    app.get('/getAllReview',(req,res)=>{
+    app.get('/getAllReview', (req, res) => {
         reviewCollection.find({})
-        .toArray((err,documents)=>{
-            res.send(documents);
-           
-        })
+            .toArray((err, documents) => {
+                res.send(documents);
+
+            })
     });
-    app.get('/getAllOrderInformation',(req,res)=>{
+    app.get('/getAllOrderInformation', (req, res) => {
         orderCollection.find({})
-        .toArray((err,documents)=>{
-            
-            res.send(documents);
-           
+            .toArray((err, documents) => {
+
+                res.send(documents);
+
+            })
+    });
+    app.post('/addAdmin', (req, res) => {
+        adminCollection.insertOne(req.body)
+            .then(result => {
+
+                res.send(result.insertedCount > 0);
+
+            })
+    });
+    app.post('/getAdmin', (req, res) => {
+        // console.log(req.body,'body');
+        adminCollection.find({email:req.body.email})
+        .toArray((err, documents) => {
+           res.send(documents.length>0)
+
         })
     });
 
