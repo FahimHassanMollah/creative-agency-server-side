@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const fileUpload=require('express-fileupload');
+const fileUpload = require('express-fileupload');
 const fs = require('fs-extra')
 const MongoClient = require('mongodb').MongoClient;
 let ObjectId = require('mongodb').ObjectID;
@@ -10,7 +10,7 @@ const port = 8080
 app.use(cors());
 app.use(bodyParser());
 app.use(bodyParser.json());
-app.use(express.static('ServiceImages')); 
+app.use(express.static('ServiceImages'));
 app.use(fileUpload());
 require('dotenv').config();
 app.get('/', (req, res) => {
@@ -81,66 +81,52 @@ client.connect(err => {
             })
     });
     app.post('/getAdmin', (req, res) => {
-        adminCollection.find({email:req.body.email})
-        .toArray((err, documents) => {
-           res.send(documents.length>0)
-        })
+        adminCollection.find({ email: req.body.email })
+            .toArray((err, documents) => {
+                res.send(documents.length > 0)
+            })
     });
     app.patch('/updateOrderStatus', (req, res) => {
         orderCollection.updateOne({ _id: ObjectId(req.body.id) },
-          {
-            $set: { status: req.body.status}
-          })
-          .then(result => {
-            if (result.modifiedCount>0) {
-               res.send(true);
-            }
-          })
-      }
-      )
-      app.post('/adminAddService', (req, res) => {
-          
+            {
+                $set: { status: req.body.status }
+            })
+            .then(result => {
+                if (result.modifiedCount > 0) {
+                    res.send(true);
+                }
+            })
+    }
+    )
+    app.post('/adminAddService', (req, res) => {
+
         const file = req.files.file;
-     
+
         const title = req.body.title;
         const description = req.body.descritpion;
-        // console.log(file,title,description);
-        const filePath = `${__dirname}/ServiceImages/${file.name}`;
-        file.mv(filePath, err => {
-            if(err){
-                console.log(err);
-                res.status(500).send({msg: 'Failed to upload Image'});
-            }
-            const newImg = fs.readFileSync(filePath);
-            const encImg = newImg.toString('base64');
-            var image = {
-                contentType: req.files.file.mimetype,
-                size: req.files.file.size,
-                img: Buffer(encImg, 'base64')
-             };
-            serviceCollection.insertOne({title,description,image})
+
+        const newImg = file.data;
+        const encImg = newImg.toString('base64');
+        var image = {
+            contentType:file.mimetype,
+            size: file.size,
+            img: Buffer.from(encImg, 'base64')
+        };
+        serviceCollection.insertOne({ title, description, image })
             .then(result => {
                 res.send(result.insertedCount > 0)
-                fs.remove(filePath, error => {
-                    if(error) {
-                        console.log(error);
-                        res.status(500).send({msg: 'Failed to upload Image'});
-                    }
-                    // res.send(result.insertedCount > 0);
-                  
-                })
+
             })
-            // return res.send({name: file.name, path: `/${file.name}`})
-        })
+
     })
     app.get('/getAllService', (req, res) => {
         serviceCollection.find({})
             .toArray((err, documents) => {
-               if (documents.length>0) {
-                   console.log(documents);
-                   res.send(documents)
-                   
-               }
+                if (documents.length > 0) {
+                    // console.log(documents);
+                    res.send(documents)
+
+                }
             })
     });
 
