@@ -7,10 +7,6 @@
  * There is an admin panel.An admin can show all order, can change the order status  can add new service
  
  ### Technology
- * React js
- * React router
- * Firebase Authentication
- * React bootstrap
  * Node.js 
  * Express js
  * MongoDB
